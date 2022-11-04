@@ -44,7 +44,7 @@ References Greene, W.H. (2003) Econometric Analysis, Prentice Hall, <https://arc
 Table 1: Description of the variables in dataset Airline from package `Ecdat` (collected 1970-1984 in USA).
 
 | Variable | Data Type |  Class  |                        Description                         |
-|:--------------:|:--------------:|:--------------:|:-----------------------:|
+|:-------------:|:-------------:|:-------------:|:-------------------------:|
 | airline  | numerical | integer |                id number of airline company                |
 |   year   | numerical | integer |                the year data was collected                 |
 |   cost   | numerical | integer |                   total cost, in \$1,000                   |
@@ -82,7 +82,7 @@ We will explore this dataset with various plots in attempt to reveal the hidden 
 
 Firstly, we will try to study the development of the different airlines across these 15 years, in terms of total cost vs fuel price and output index vs load capacity. For this, we will construct a line graph of The total costs vs total output and group the data by each airline. To add another dimension to the graph, we will add bubble to it.
 
-```{r plot1, fig.cap = "A: Line Graph of total costs for 6 airlines in US between 1970 and 1984 (grouped by airlines, with fuel price as bubble). B: Line Graph of total ouput (index number) for 6 airlines in US between 1970 and 1984 (grouped by airlines, with load capacity as bubble)", fig.height = 7, fig.width = 8}
+```{r plot1, fig.cap = "A: Line Graph of total costs for 6 airlines in US between 1970 and 1984 (grouped by airlines, with fuel price as bubble). B: Line Graph of total ouput (index number) for 6 airlines in US between 1970 and 1984 (grouped by airlines, with load as bubble)", fig.height = 7, fig.width = 8}
 
 library(patchwork)
 p1 <- 
@@ -93,8 +93,7 @@ p1 <-
     x = "Year",
     y = "Total Cost per year (in $1,000)",
     col = "Airlines"
-  ) +
-  guides(size = guide_legend("Fuel Price"))
+  )
 
 p2 <-
   ggplot(airline, aes(year, output, group = ID, col = ID)) +
@@ -104,8 +103,7 @@ p2 <-
     x = "Year",
     y = "Total output per year (index number)",
     col = "Airlines"
-  ) +
-  guides(size = guide_legend("Load Capacity"))
+  )
 
 plot_together <- p1 / p2
 
@@ -122,18 +120,16 @@ In plot B, the output index increased in the early stage during 1970-1979 and re
 
 Looking back at plot A, it is clear that the fuel price reached its peak around 1981-1982 and this is probably correlated to the lowest output index around the same time in plot B. From this finding, we could say that the higher fuel price around 1978-1980 might have alerted the airlines to cut down their business in scale since the load capacity decreased and the output index have also declined for the larger airlines 1, 2 & 3 during 1979-1981. Further that the increase of the total costs and fuel price very much negatively affected the profit for the airlines especially for large airlines like 1 & 2 in 1979-1981.
 
-## Box Plot
+## Box plot
 
-Since we have already explored the numerical variables in the dataset in terms of total cost and profit (output index), now we will dig deeper in these indicators to reveal more patterns. To make the plot more insightful, we will add a new variable *output efficiency* based on $${output efficiency} = \frac{output}{total cost} * 1000000$$ across all these 15 years for all the airlines and plot it in a box plot to compare its median and IQR among them.
+Since we have already explored the numerical variables in the dataset in terms of total cost and profit (output index), now we will dig deeper in these indicators to reveal more patterns. To make the plot more insightful, we will add a new variable *output efficiency* based on \$\$ output / total cost \* 1,000,000 \$\$ across all these 15 years for all the airlines and plot it in a box plot to compare its median and IQR among them.
 
-```{r plot2, fig.height = 4, fig.width = 5, fig.cap = "Ordered Box Plot of the Output Efficiency (per 1 million passangers per mile / Total Cost in thousand dollar) for the sex airlines between 1970-1984 in USA."}
+```{r plot2, fig.height = 4, fig.width = 5, fig.cap = "Box Plot of the Output Efficiency (per 1 million passangers per mile / Total Cost in thousand dollar) for each airline between 1970-1984 in USA."}
 
 airline <- airline %>%
   mutate(output_eff = output / cost * 1000000)  # output_eff is based on revenue / total cost (in thousand) per 1,000,000 passengers
-  
-  
-  
-ggplot(airline, aes(x = reorder(factor(ID), output_eff), y = output_eff)) +
+
+ggplot(airline, aes(factor(ID), output_eff)) +
   geom_boxplot() +
   labs(
     x = "Airlines",
@@ -141,6 +137,8 @@ ggplot(airline, aes(x = reorder(factor(ID), output_eff), y = output_eff)) +
     tex = 1
   ) +
   theme(text = element_text(size = 12)) # the font size of # Axis titles
+
+
 
 ```
 
@@ -150,7 +148,7 @@ Now looking at the IQR, another insight is revealed that operating as larger air
 
 ## Interactive Scatter Plot with Plotly
 
-Now let's explore the correlation between the *fuel price* and *output efficiency* with a scatter plot. The plot will be provided in a separate file uploaded to my github for viewing.
+Now let's explore the correlation between the *fuel price* and *output efficiency* with a scatter plot. The plot will be Provided in a separate file in format of png.
 
 ```{r plot3, fig.cap = "Interactive Scatter PLot (with plotly) of fuel price vs output effieciency with smoothing method loess"}
 library(plotly)
@@ -183,7 +181,7 @@ As to our expectation, the output efficiency has a strong negative correlation t
 
 ## Animation
 
-In the end, here is an animated version of bubble plot (A in plot 1) for the variable *total cost* with *fuel price* coded as the size of the bubble for these six airlines for year 1970-1984, mostly for fun. The plot will be provided in a separate file in format of gif.
+In the end, here is an animated version of bubble plot (A in plot 1) for the variable *total cost* with *fuel price* coded as the size of the bubble for these 6 airlines for year 1970-1984, mostly for fun. The plot will be Provided in a separate file in format of png.
 
 ```{r plot4, fig.width = 4, fig.height = 4, fig.cap = "animated bubble plot for total costs for all the airline across year 1970-1984"}
 library(gganimate)
@@ -197,13 +195,12 @@ plot_ani <- ggplot(airline, aes(year, cost, group = ID, col = ID)) +
     y = "Total Cost per year (in $1,000)",
     col = "Airlines"
   ) +
-  guides(size = guide_legend("Fuel Price")) +
   theme(text = element_text(size = 12)) + # the font size of # Axis titles 
   transition_time(year)
 
 
-ani <- plot_ani + labs(title = "Year: {(frame_time)}")
-animate(ani, duration = 20) # slower by changing duration from default 10 to 20 
+#ani <- plot_ani + labs(title = "Year: {(frame_time)}")
+#animate(ani, duration = 20) # slower by changing duration from default 10 to 20 
 ```
 
 # Conclusion
